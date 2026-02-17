@@ -133,3 +133,6 @@ Compressed output is supported via `.gz`, `.bz2`, `.xz`, and `.zip` suffixes.
 - **pyarrow**: Parquet and Feather file support.
 - **pyyaml**: YAML file support.
 - **scipy**: MTX (Matrix Market) sparse matrix support.
+
+[python]: https://www.python.org/
+[uv]: https://docs.astral.sh/uv/
