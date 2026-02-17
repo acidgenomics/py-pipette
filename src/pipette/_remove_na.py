@@ -31,7 +31,5 @@ def remove_na(x: Any, how: str = "all") -> Any:
     if isinstance(x, pd.Series):
         return x.dropna()
     if isinstance(x, list):
-        return [
-            v for v in x if v is not None and not (isinstance(v, float) and np.isnan(v))
-        ]
+        return [v for v in x if v is not None and not (isinstance(v, float) and np.isnan(v))]
     return x

@@ -1,7 +1,6 @@
 """Tests for package-level imports."""
 
 
-
 class TestPackageImport:
     """Tests for package-level import."""
 
