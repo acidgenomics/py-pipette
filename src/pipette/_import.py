@@ -411,9 +411,7 @@ def _import_feather(
     return _return_import(df, rownames=rownames)
 
 
-def _import_hdf5(
-    path: str, rownames: bool = True, make_names: bool = True, **kwargs: Any
-) -> Any:
+def _import_hdf5(path: str, rownames: bool = True, make_names: bool = True, **kwargs: Any) -> Any:
     """Import HDF5 file."""
     df = pd.read_hdf(path)
     if isinstance(df, pd.DataFrame):

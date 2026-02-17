@@ -1,7 +1,5 @@
 """Tests for utility functions."""
 
-
-
 from pipette._checksums import md5, sha256
 from pipette._file_utils import basename_sans_ext, compress_ext, file_ext, is_url
 from pipette._fill_lines import fill_lines
