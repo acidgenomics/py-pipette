@@ -4,14 +4,18 @@ Unified import and export of data in Python.
 
 ## Installation
 
+This is a [Python][] package.
+We recommend using [uv][] to install.
+
 ```sh
-uv pip install pipette
+uv venv './.venv'
+source './.venv/bin/activate'
+uv pip install 'git+https://github.com/acidgenomics/py-syntactic[extra]'
+python3
 ```
 
-Install with extra dependencies, for XLSX, MTX, and other file types:
-
-```sh
-uv pip install pipette[extra]
+```python
+import pipette
 ```
 
 ## Quick Start
