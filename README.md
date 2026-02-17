@@ -10,7 +10,7 @@ We recommend using [uv][] to install.
 ```sh
 uv venv './.venv'
 source './.venv/bin/activate'
-uv pip install 'git+https://github.com/acidgenomics/py-syntactic[extra]'
+uv pip install 'git+https://github.com/acidgenomics/py-pipette[extra]'
 python3
 ```
 
