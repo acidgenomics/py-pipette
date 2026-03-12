@@ -1,9 +1,4 @@
-"""pipette: Unified import and export of data in Python.
-
-A Python port of the R/Bioconductor pipette package.
-"""
-
-__version__ = "0.15.3"
+"""pipette: Unified import and export of data in Python."""
 
 from pipette._atomize import atomize
 from pipette._cache_url import cache_url
