@@ -320,10 +320,25 @@ def _import_gct(
 ) -> pd.DataFrame:
     """Import GCT file."""
     with open(path) as f:
-        f.readline().rstrip()
-        f.readline().rstrip().split("\t")
+        version_line = f.readline().rstrip()
+        if not version_line.startswith("#1"):
+            raise ValueError(f"Unrecognised GCT format version: {version_line!r}")
+        dim_parts = f.readline().rstrip().split("\t")
+        if len(dim_parts) < 2:
+            raise ValueError("GCT line 2 must declare row and column counts.")
+        declared_rows, declared_cols = int(dim_parts[0]), int(dim_parts[1])
     skip = 2
     df = pd.read_csv(path, sep="\t", skiprows=skip, dtype=str)
+    # Validate dimensions against declared counts.
+    data_cols = [c for c in df.columns if c not in ("Name", "NAME", "Description")]
+    if len(df) != declared_rows:
+        raise ValueError(
+            f"GCT declared {declared_rows} rows but found {len(df)}."
+        )
+    if len(data_cols) != declared_cols:
+        raise ValueError(
+            f"GCT declared {declared_cols} data columns but found {len(data_cols)}."
+        )
     if "Description" in df.columns:
         df = df.drop(columns=["Description"])
     if "NAME" in df.columns:

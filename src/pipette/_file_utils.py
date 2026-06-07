@@ -88,11 +88,20 @@ def compress_ext(path: str) -> str | None:
 
 
 def base_ext(path: str) -> str:
-    """Get the base (non-compression) file extension."""
+    """Get the base (non-compression) file extension.
+
+    For compound extensions like ``csv.gz``, returns ``csv``.
+    For bare compression extensions like ``gz``, returns ``""``
+    (no inner format known).
+    For non-compressed extensions, returns the extension unchanged.
+    """
     ext = file_ext(path)
     for ce in _COMPRESS_EXTS:
         if ext.endswith("." + ce):
             return ext[: -(len(ce) + 1)]
+        if ext == ce:
+            # Bare compression with no inner extension: format unknown.
+            return ""
     return ext
 
 
