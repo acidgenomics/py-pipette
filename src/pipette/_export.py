@@ -122,6 +122,18 @@ def _export_by_format(x: Any, path: str, fmt: str, rownames: bool = True, **kwar
         _export_excel(x, path, rownames=rownames, **kwargs)
     elif fmt == "hdf5":
         _export_hdf5(x, path, **kwargs)
+    elif fmt == "gmt":
+        _export_gmt(x, path, **kwargs)
+    elif fmt == "gmx":
+        _export_gmx(x, path, **kwargs)
+    elif fmt == "grp":
+        _export_grp(x, path, **kwargs)
+    elif fmt == "gct":
+        _export_gct(x, path, **kwargs)
+    elif fmt == "gaf":
+        _export_gaf(x, path, **kwargs)
+    elif fmt == "mtx":
+        _export_mtx(x, path, **kwargs)
     else:
         msg = f"Export not supported for format: {fmt!r}"
         raise ValueError(msg)
@@ -228,3 +240,86 @@ def _export_hdf5(x: Any, path: str, *, key: str = "data", **kwargs: Any) -> None
     if not isinstance(x, pd.DataFrame):
         x = pd.DataFrame(x)
     x.to_hdf(path, key=key, **kwargs)
+
+
+def _export_gmt(x: dict[str, list[str]], path: str, **kwargs: Any) -> None:
+    """Export gene set dict to GMT (Gene Matrix Transposed) file.
+
+    Each entry writes one tab-separated line: name, description (empty), genes.
+    """
+    if not isinstance(x, dict):
+        msg = "GMT export requires a dict mapping set names to gene lists."
+        raise TypeError(msg)
+    with open(path, "w") as f:
+        for name, genes in x.items():
+            f.write("\t".join([name, "", *list(genes)]) + "\n")
+
+
+def _export_gmx(x: dict[str, list[str]], path: str, **kwargs: Any) -> None:
+    """Export gene set dict to GMX (vertical gene set) file.
+
+    Header row = set names; second row = descriptions (empty);
+    remaining rows = genes (padded with empty strings).
+    """
+    if not isinstance(x, dict):
+        msg = "GMX export requires a dict mapping set names to gene lists."
+        raise TypeError(msg)
+    names = list(x.keys())
+    gene_lists = [list(x[n]) for n in names]
+    max_len = max((len(g) for g in gene_lists), default=0)
+    with open(path, "w") as f:
+        f.write("\t".join(names) + "\n")
+        f.write("\t".join("" for _ in names) + "\n")
+        for i in range(max_len):
+            row = [gl[i] if i < len(gl) else "" for gl in gene_lists]
+            f.write("\t".join(row) + "\n")
+
+
+def _export_grp(x: list[str], path: str, **kwargs: Any) -> None:
+    """Export gene list to GRP file (one gene per line)."""
+    if isinstance(x, pd.Series):
+        x = x.tolist()
+    if not isinstance(x, (list, tuple)):
+        msg = "GRP export requires a list of strings."
+        raise TypeError(msg)
+    with open(path, "w") as f:
+        for item in x:
+            f.write(str(item) + "\n")
+
+
+def _export_gct(x: pd.DataFrame, path: str, **kwargs: Any) -> None:
+    """Export DataFrame to GCT (Gene Cluster Text) format.
+
+    Writes version line ``#1.2``, dimension line, and data with
+    Name and Description columns.
+    """
+    if not isinstance(x, pd.DataFrame):
+        msg = "GCT export requires a pandas DataFrame."
+        raise TypeError(msg)
+    n_rows, n_cols = x.shape
+    with open(path, "w") as f:
+        f.write("#1.2\n")
+        f.write(f"{n_rows}\t{n_cols}\n")
+        # Header: Name, Description, then sample columns.
+        header = ["Name", "Description", *list(x.columns)]
+        f.write("\t".join(header) + "\n")
+        for idx, row in x.iterrows():
+            f.write("\t".join([str(idx), "na", *[str(v) for v in row]]) + "\n")
+
+
+def _export_gaf(x: pd.DataFrame, path: str, **kwargs: Any) -> None:
+    """Export DataFrame to GAF (Gene Association Format) file."""
+    if not isinstance(x, pd.DataFrame):
+        msg = "GAF export requires a pandas DataFrame."
+        raise TypeError(msg)
+    x.to_csv(path, sep="\t", index=False, header=False)
+
+
+def _export_mtx(x: Any, path: str, **kwargs: Any) -> None:
+    """Export sparse matrix to MTX (Matrix Market) file."""
+    try:
+        from scipy.io import mmwrite  # noqa: PLC0415
+    except ImportError as err:
+        msg = "scipy is required for MTX export. Install it with: pip install scipy"
+        raise ImportError(msg) from err
+    mmwrite(path, x)

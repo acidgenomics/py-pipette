@@ -23,6 +23,7 @@ from pipette._remove_na import remove_na
 from pipette._sanitize_na import sanitize_na
 from pipette._sanitize_percent import sanitize_percent
 from pipette._save_data import save_data
+from pipette._save_load import assign_and_save_data, load_data_as_name
 from pipette._transmit import transmit
 from pipette._unfactorize import unfactorize
 
@@ -31,6 +32,7 @@ na_strings = NA_STRINGS
 __all__ = [
     "NA_STRINGS",
     "PIPETTE_TESTS_URL",
+    "assign_and_save_data",
     "atomize",
     "cache_url",
     "decode",
@@ -44,6 +46,7 @@ __all__ = [
     "import_data",
     "init_dir",
     "load_data",
+    "load_data_as_name",
     "load_remote_data",
     "match_rowname_column",
     "md5",
