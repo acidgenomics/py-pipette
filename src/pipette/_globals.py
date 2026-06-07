@@ -1,17 +1,21 @@
 """Global constants for pipette."""
 
 NA_STRINGS: list[str] = [
+    "",
+    ".",
+    "#N/A",
+    "#n/a",
+    "N/A",
     "NA",
     "NaN",
     "NULL",
     "None",
+    "\\N",
+    "_",
     "n/a",
-    "none",
-    "",
-    ".",
     "na",
+    "none",
     "null",
-    "#N/A",
 ]
 """Strings treated as NA during import."""
 
