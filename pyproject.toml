@@ -47,15 +47,15 @@ Issues = "https://github.com/acidgenomics/pipette/issues"
 [tool.bumpver]
 commit = true
 commit_message = "Bump to {new_version}."
-current_version = "0.1.0"
+current_version = "v0.1.0"
 push = false
 tag = false
 tag_message = "{new_version}"
 tag_scope = "default"
-version_pattern = "MAJOR.MINOR.PATCH"
+version_pattern = "vMAJOR.MINOR.PATCH"
 
 [tool.bumpver.file_patterns]
-"pyproject.toml" = ['current_version = "{version}"', 'version = "{version}"']
+"pyproject.toml" = ['current_version = "{version}"', 'version = "{pep440_version}"']
 
 [tool.coverage.run]
 relative_files = true
@@ -91,6 +91,7 @@ verboseOutput = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-v --tb=short"
+markers = ["network: marks tests that require network access"]
 
 [tool.ruff]
 indent-width = 4
@@ -151,14 +152,18 @@ max-complexity = 30
     "ANN001",
     "ANN201",
     "ANN202",
+    "ANN204",
     "D101",
     "D102",
     "D103",
     "D104",
     "F841",
+    "N801",
     "N803",
     "PLC0415",
     "PLR2004",
+    "RUF012",
+    "RUF043",
 ]
 
 [tool.ruff.lint.pycodestyle]
