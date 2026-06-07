@@ -131,5 +131,5 @@ class TestMakeValidNames:
     def test_unknown_format_error(self, tmp_path) -> None:
         path = tmp_path / "file"
         path.write_text("data")
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="Cannot detect format"):
             import_data(str(path), quiet=True)

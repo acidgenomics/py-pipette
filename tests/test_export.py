@@ -77,6 +77,33 @@ class TestExportCompressed:
         assert imported.shape == sample_df.shape
 
 
+class TestExportParquet:
+    def test_roundtrip(self, sample_df, tmp_path) -> None:
+        pytest.importorskip("pyarrow")
+        path = str(tmp_path / "output.parquet")
+        export_data(sample_df.reset_index(drop=True), path, quiet=True)
+        imported = import_data(path, quiet=True)
+        assert imported.shape == sample_df.shape
+
+
+class TestExportFeather:
+    def test_roundtrip(self, sample_df, tmp_path) -> None:
+        pytest.importorskip("pyarrow")
+        path = str(tmp_path / "output.feather")
+        export_data(sample_df.reset_index(drop=True), path, quiet=True)
+        imported = import_data(path, quiet=True)
+        assert imported.shape == sample_df.shape
+
+
+class TestExportExcel:
+    def test_roundtrip(self, sample_df, tmp_path) -> None:
+        pytest.importorskip("openpyxl")
+        path = str(tmp_path / "output.xlsx")
+        export_data(sample_df.reset_index(drop=True), path, quiet=True)
+        imported = import_data(path, quiet=True)
+        assert imported.shape == sample_df.shape
+
+
 class TestExportOverwrite:
     def test_no_overwrite_by_default(self, sample_df, tmp_path) -> None:
         path = str(tmp_path / "output.csv")
