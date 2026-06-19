@@ -88,11 +88,20 @@ def compress_ext(path: str) -> str | None:
 
 
 def base_ext(path: str) -> str:
-    """Get the base (non-compression) file extension."""
+    """Get the base (non-compression) file extension.
+
+    For compound extensions like ``csv.gz``, returns ``csv``.
+    For bare compression extensions like ``gz``, returns ``""``
+    (no inner format known).
+    For non-compressed extensions, returns the extension unchanged.
+    """
     ext = file_ext(path)
     for ce in _COMPRESS_EXTS:
         if ext.endswith("." + ce):
             return ext[: -(len(ce) + 1)]
+        if ext == ce:
+            # Bare compression with no inner extension: format unknown.
+            return ""
     return ext
 
 
@@ -155,6 +164,7 @@ def local_or_remote_file(path: str) -> Generator[str]:
     """Context manager yielding a local file path.
 
     If path is a URL, downloads to a temp file and yields the temp path.
+    If path is an S3 URI, downloads from S3 to a temp file.
     Otherwise yields the path directly.
     """
     if is_url(path):
@@ -163,6 +173,15 @@ def local_or_remote_file(path: str) -> Generator[str]:
             tmp_path = tmp.name
         try:
             urllib.request.urlretrieve(path, tmp_path)
+            yield tmp_path
+        finally:
+            if os.path.exists(tmp_path):
+                os.unlink(tmp_path)
+    elif path.startswith("s3://"):
+        from pipette._s3 import _s3_download  # noqa: PLC0415
+
+        tmp_path = _s3_download(path)
+        try:
             yield tmp_path
         finally:
             if os.path.exists(tmp_path):
