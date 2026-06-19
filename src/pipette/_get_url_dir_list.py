@@ -27,6 +27,8 @@ def get_url_dir_list(url: str) -> list[str]:
 
 def _ftp_dir_list(parsed: ParseResult) -> list[str]:
     """Get FTP directory listing."""
+    if parsed.hostname is None:
+        raise ValueError(f"Could not parse hostname from URL: {parsed.geturl()!r}")
     ftp = FTP(parsed.hostname)
     ftp.login()
     entries = ftp.nlst(parsed.path)

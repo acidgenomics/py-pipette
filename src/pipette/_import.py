@@ -332,13 +332,9 @@ def _import_gct(
     # Validate dimensions against declared counts.
     data_cols = [c for c in df.columns if c not in ("Name", "NAME", "Description")]
     if len(df) != declared_rows:
-        raise ValueError(
-            f"GCT declared {declared_rows} rows but found {len(df)}."
-        )
+        raise ValueError(f"GCT declared {declared_rows} rows but found {len(df)}.")
     if len(data_cols) != declared_cols:
-        raise ValueError(
-            f"GCT declared {declared_cols} data columns but found {len(data_cols)}."
-        )
+        raise ValueError(f"GCT declared {declared_cols} data columns but found {len(data_cols)}.")
     if "Description" in df.columns:
         df = df.drop(columns=["Description"])
     if "NAME" in df.columns:

@@ -1,6 +1,6 @@
 """Convert columns to categorical (factor) type."""
 
-from typing import Any
+from typing import Any, cast
 
 import pandas as pd
 
@@ -25,7 +25,7 @@ def factorize(x: Any) -> Any:
     if isinstance(x, pd.DataFrame):
         result = x.copy()
         for col in result.columns:
-            s = result[col]
+            s = cast(pd.Series, result[col])
             if _is_string_dtype(s) and not s.is_unique and len(s) > 0:
                 result[col] = pd.Categorical(s)
         return result
