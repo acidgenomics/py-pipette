@@ -233,7 +233,7 @@ def _export_excel(x: Any, path: str, rownames: bool = True, **kwargs: Any) -> No
 def _export_hdf5(x: Any, path: str, *, key: str = "data", **kwargs: Any) -> None:
     """Export DataFrame to HDF5 file."""
     try:
-        import tables  # noqa: F401, PLC0415
+        import tables  # noqa: F401, PLC0415  # type: ignore[import-untyped]  # ty: ignore[unresolved-import]
     except ImportError as err:
         msg = "tables is required for HDF5 export. Install it with: pip install tables"
         raise ImportError(msg) from err

@@ -54,7 +54,7 @@ def _s3_download(uri: str, *, quiet: bool = False) -> str:
         Path to the downloaded temp file.
     """
     try:
-        import boto3  # noqa: PLC0415
+        import boto3  # noqa: PLC0415  # type: ignore[import-untyped]  # ty: ignore[unresolved-import]
     except ImportError as err:
         msg = "boto3 is required for S3 support. Install it with: pip install boto3"
         raise ImportError(msg) from err
@@ -86,7 +86,7 @@ def _s3_upload(local_path: str, uri: str, *, quiet: bool = False) -> str:
         The S3 URI.
     """
     try:
-        import boto3  # noqa: PLC0415
+        import boto3  # noqa: PLC0415  # type: ignore[import-untyped]  # ty: ignore[unresolved-import]
     except ImportError as err:
         msg = "boto3 is required for S3 support. Install it with: pip install boto3"
         raise ImportError(msg) from err
