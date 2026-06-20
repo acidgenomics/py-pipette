@@ -33,8 +33,11 @@ def cache_url(
     cache_dir = os.path.join(os.path.expanduser("~"), ".cache", pkg)
     os.makedirs(cache_dir, exist_ok=True)
     url_hash = hashlib.md5(url.encode()).hexdigest()[:8]
-    ext = file_ext(url)
-    name = basename_sans_ext(url)
+    # Strip query string and fragment before extracting filename parts,
+    # otherwise ext/name will include '?token=abc' etc.
+    url_path = url.split("?", 1)[0].split("#", 1)[0]
+    ext = file_ext(url_path)
+    name = basename_sans_ext(url_path)
     filename = f"{name}_{url_hash}"
     if ext:
         filename += "." + ext

@@ -30,4 +30,7 @@ def atomize(df: pd.DataFrame) -> pd.DataFrame:
                 break
         if is_scalar:
             keep.append(col)
-    return df[keep].copy()
+    result = df[keep]
+    if not isinstance(result, pd.DataFrame):
+        raise TypeError("Expected a DataFrame after column selection.")
+    return result.copy()

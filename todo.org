@@ -1,0 +1,2 @@
+** TODO Ensure we support H5AD loading through anndataR.
+    Need to benchmark this with recent CELLxGENE objects.
