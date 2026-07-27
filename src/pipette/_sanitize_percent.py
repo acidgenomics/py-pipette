@@ -39,6 +39,6 @@ def _sanitize_percent_series(s: pd.Series) -> pd.Series:
         return s
     # Build new series with mixed types (object dtype).
     result = s.astype(object).copy()
-    pct_vals = str_vals[mask].str.rstrip("%").astype(float) / 100.0
+    pct_vals = str_vals.loc[mask].str.rstrip("%").astype(float) / 100.0
     result.loc[mask] = pct_vals
     return result

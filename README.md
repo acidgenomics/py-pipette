@@ -4,18 +4,26 @@ Unified import and export of data in Python.
 
 ## Installation
 
-This is a [Python][] package.
+This is a [Python][] package hosted at [python.acidgenomics.com][].
 We recommend using [uv][] to install.
 
 ```sh
-uv venv './.venv'
-source './.venv/bin/activate'
-uv pip install 'git+https://github.com/acidgenomics/py-pipette[extra]'
-python3
+uv pip install \
+    --index-url 'https://python.acidgenomics.com/simple/' \
+    'pipette[extra]'
 ```
 
-```python
-import pipette
+Or add the index to your project's `pyproject.toml`:
+
+```toml
+[[tool.uv.index]]
+url = "https://python.acidgenomics.com/simple/"
+```
+
+Then install:
+
+```sh
+uv add 'pipette[extra]'
 ```
 
 ## Quick Start
@@ -135,4 +143,10 @@ Compressed output is supported via `.gz`, `.bz2`, `.xz`, and `.zip` suffixes.
 - **scipy**: MTX (Matrix Market) sparse matrix support.
 
 [python]: https://www.python.org/
+[python.acidgenomics.com]: https://python.acidgenomics.com
 [uv]: https://docs.astral.sh/uv/
+
+
+## License
+
+Apache-2.0 — Copyright 2026 Acid Genomics LLC — see [LICENSE](LICENSE).
