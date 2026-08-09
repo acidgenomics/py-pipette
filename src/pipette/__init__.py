@@ -1,4 +1,4 @@
-"""pipette: Unified import and export of data in Python."""
+"""Pipette: Unified import and export of data in Python."""
 
 from pipette._atomize import atomize
 from pipette._cache_url import cache_url

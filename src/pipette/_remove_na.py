@@ -19,7 +19,8 @@ def remove_na(x: Any, how: str = "all") -> Any:
 
     Returns
     -------
-    Data with NA values removed.
+    pd.DataFrame, pd.Series, or list
+        Same type as ``x``, with NA values removed.
     """
     if isinstance(x, pd.DataFrame):
         df = x

@@ -15,7 +15,9 @@ def unfactorize(x: Any) -> Any:
 
     Returns
     -------
-    Same type as input with categorical columns converted back.
+    pd.DataFrame or pd.Series
+        Same type as input, with ``Categorical`` columns converted back
+        to their underlying dtype.
     """
     if isinstance(x, pd.DataFrame):
         result = x.copy()

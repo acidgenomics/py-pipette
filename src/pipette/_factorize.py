@@ -20,7 +20,9 @@ def factorize(x: Any) -> Any:
 
     Returns
     -------
-    Same type as input with eligible columns converted to Categorical.
+    pd.DataFrame or pd.Series
+        Same type as input, with columns whose non-empty, non-unique
+        string-like values converted to ``Categorical``.
     """
     if isinstance(x, pd.DataFrame):
         result = x.copy()

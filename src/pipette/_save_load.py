@@ -47,7 +47,7 @@ def assign_and_save_data(
     --------
     >>> import tempfile, os
     >>> with tempfile.TemporaryDirectory() as d:
-    ...     p = assign_and_save_data("myobj", {"x": 1}, dir=d)
+    ...     p = assign_and_save_data("myobj", {"x": 1}, dir=d, quiet=True)
     ...     os.path.basename(p)
     'myobj.pickle'
     """
@@ -87,10 +87,9 @@ def load_data_as_name(
     --------
     >>> import tempfile, os
     >>> with tempfile.TemporaryDirectory() as d:
-    ...     assign_and_save_data("src", [1, 2, 3], dir=d)
-    ...     result = load_data_as_name(("dest", "src"), dir=d)
+    ...     _ = assign_and_save_data("src", [1, 2, 3], dir=d, quiet=True)
+    ...     result = load_data_as_name(("dest", "src"), dir=d, quiet=True)
     ...     result["dest"]
-    '/...src.pickle'
     [1, 2, 3]
     """
     result: dict[str, Any] = {}

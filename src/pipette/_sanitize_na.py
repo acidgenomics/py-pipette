@@ -20,7 +20,8 @@ def sanitize_na(x: Any, na_strings: list[str] | None = None) -> Any:
 
     Returns
     -------
-    Same type as input with NA strings replaced by NaN.
+    pd.DataFrame, pd.Series, or list
+        Same type as input with NA strings replaced by NaN.
     """
     if na_strings is None:
         na_strings = NA_STRINGS

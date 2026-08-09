@@ -9,7 +9,17 @@ def match_rowname_column(df: pd.DataFrame) -> str | None:
     """Detect a row name column in a DataFrame.
 
     Checks for columns matching common row name patterns.
-    Returns the column name if found and values are unique, else None.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Input DataFrame.
+
+    Returns
+    -------
+    str or None
+        Name of the detected row-name column, or ``None`` if no column
+        matches a known pattern with unique values.
     """
     if not isinstance(df, pd.DataFrame):
         return None

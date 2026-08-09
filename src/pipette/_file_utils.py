@@ -68,7 +68,20 @@ _FORMAT_MAP: dict[str, str] = {
 
 
 def file_ext(path: str) -> str:
-    """Get file extension(s), collapsing compound extensions."""
+    """Get file extension(s), collapsing compound extensions.
+
+    Parameters
+    ----------
+    path : str
+        File path.
+
+    Returns
+    -------
+    str
+        Extension(s), lowercased, without leading dot. Compound
+        compression extensions (e.g. ``csv.gz``) are collapsed to a
+        single string.
+    """
     name = os.path.basename(path)
     parts = name.split(".")
     if len(parts) <= 1:
@@ -80,7 +93,18 @@ def file_ext(path: str) -> str:
 
 
 def compress_ext(path: str) -> str | None:
-    """Get compression extension, or None."""
+    """Get compression extension, or None.
+
+    Parameters
+    ----------
+    path : str
+        File path.
+
+    Returns
+    -------
+    str or None
+        Recognized compression extension, or ``None`` if not compressed.
+    """
     ext = os.path.basename(path).split(".")[-1].lower()
     if ext in _COMPRESS_EXTS:
         return ext
@@ -94,6 +118,16 @@ def base_ext(path: str) -> str:
     For bare compression extensions like ``gz``, returns ``""``
     (no inner format known).
     For non-compressed extensions, returns the extension unchanged.
+
+    Parameters
+    ----------
+    path : str
+        File path.
+
+    Returns
+    -------
+    str
+        Base extension, without leading dot.
     """
     ext = file_ext(path)
     for ce in _COMPRESS_EXTS:
@@ -106,25 +140,74 @@ def base_ext(path: str) -> str:
 
 
 def is_url(path: str) -> bool:
-    """Check if a path is a URL."""
+    """Check if a path is a URL.
+
+    Parameters
+    ----------
+    path : str
+        Path or URL to check.
+
+    Returns
+    -------
+    bool
+        ``True`` if ``path`` starts with ``http://``, ``https://``, or
+        ``ftp://``.
+    """
     return bool(re.match(r"^(https?|ftp)://", path))
 
 
 def basename_sans_ext(path: str) -> str:
-    """Get basename without any extensions."""
+    """Get basename without any extensions.
+
+    Parameters
+    ----------
+    path : str
+        File path.
+
+    Returns
+    -------
+    str
+        Basename with all extensions removed.
+    """
     name = os.path.basename(path)
     parts = name.split(".")
     return parts[0]
 
 
 def init_dir(path: str) -> str:
-    """Create directory if it doesn't exist."""
+    """Create directory if it doesn't exist.
+
+    Parameters
+    ----------
+    path : str
+        Directory path to create.
+
+    Returns
+    -------
+    str
+        The ``path`` argument, unchanged.
+    """
     os.makedirs(path, exist_ok=True)
     return path
 
 
 def decompress_file(path: str, dest: str | None = None) -> str:
-    """Decompress a file, returning path to decompressed file."""
+    """Decompress a file, returning path to decompressed file.
+
+    Parameters
+    ----------
+    path : str
+        Compressed file path.
+    dest : str, optional
+        Destination path for the decompressed file. Defaults to ``path``
+        with its compression extension stripped.
+
+    Returns
+    -------
+    str
+        Path to the decompressed file (or ``path`` unchanged if it isn't
+        recognized as compressed).
+    """
     ext = compress_ext(path)
     if ext is None:
         return path
@@ -148,7 +231,20 @@ def decompress_file(path: str, dest: str | None = None) -> str:
 
 
 def compress_file(path: str, ext: str = "gz") -> str:
-    """Compress a file, returning path to compressed file."""
+    """Compress a file, returning path to compressed file.
+
+    Parameters
+    ----------
+    path : str
+        File path to compress.
+    ext : str
+        Compression format: one of ``"gz"``, ``"bz2"``, ``"xz"``.
+
+    Returns
+    -------
+    str
+        Path to the compressed file (``path`` with ``ext`` appended).
+    """
     dest = path + "." + ext
     openers = {"gz": gzip.open, "bz2": bz2.open, "xz": lzma.open}
     opener = openers.get(ext)
@@ -166,6 +262,16 @@ def local_or_remote_file(path: str) -> Generator[str]:
     If path is a URL, downloads to a temp file and yields the temp path.
     If path is an S3 URI, downloads from S3 to a temp file.
     Otherwise yields the path directly.
+
+    Parameters
+    ----------
+    path : str
+        Local path, URL, or S3 URI.
+
+    Yields
+    ------
+    str
+        A local filesystem path to ``path``'s contents.
     """
     if is_url(path):
         suffix = "." + file_ext(path).split(".")[0] if file_ext(path) else ""

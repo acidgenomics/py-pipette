@@ -19,7 +19,8 @@ def metadata2(df: pd.DataFrame, key: str, set_value: Any = None) -> Any:
 
     Returns
     -------
-    The metadata value when getting, or None when setting.
+    object or None
+        The metadata value when getting, or ``None`` when setting.
     """
     if set_value is not None:
         df.attrs[key] = set_value

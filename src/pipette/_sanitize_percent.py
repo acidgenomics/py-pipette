@@ -15,7 +15,9 @@ def sanitize_percent(x: Any) -> Any:
 
     Returns
     -------
-    Same type as input with percent strings converted to floats.
+    pd.DataFrame or pd.Series
+        Same type as input, with percent strings converted to numeric
+        fractions (e.g. ``"50%"`` becomes ``0.5``).
     """
     if isinstance(x, pd.DataFrame):
         return x.apply(_sanitize_percent_series)
