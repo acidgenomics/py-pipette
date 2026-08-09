@@ -1,8 +1,12 @@
 # pipette
 
+[![Install with Bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](https://bioconda.github.io/recipes/pipette/README.html) ![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)
+
 Unified import and export of data in Python.
 
 ## Installation
+
+### [uv][] method
 
 This is a [Python][] package hosted at [python.acidgenomics.com][].
 We recommend using [uv][] to install.
@@ -25,6 +29,22 @@ Then install:
 ```sh
 uv add 'pipette[extra]'
 ```
+
+### [Conda][] method
+
+Configure [Conda][] to use the [Bioconda][] channels.
+
+```sh
+# Don't install recipe into base environment.
+name='pipette'
+conda create --name="$name" "$name"
+conda activate "$name"
+python -c 'import pipette'
+```
+
+Conda has no equivalent of Python extras. For the optional format support that
+`pipette[extra]` provides, add the dependencies to the environment:
+`conda create --name="$name" "$name" openpyxl pyarrow pyyaml scipy`.
 
 ## Quick Start
 
@@ -142,6 +162,8 @@ Compressed output is supported via `.gz`, `.bz2`, `.xz`, and `.zip` suffixes.
 - **pyyaml**: YAML file support.
 - **scipy**: MTX (Matrix Market) sparse matrix support.
 
+[bioconda]: https://bioconda.github.io/
+[conda]: https://docs.conda.io/
 [python]: https://www.python.org/
 [python.acidgenomics.com]: https://python.acidgenomics.com
 [uv]: https://docs.astral.sh/uv/
