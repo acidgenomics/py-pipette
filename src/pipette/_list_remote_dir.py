@@ -6,7 +6,7 @@ from ftplib import FTP
 from urllib.parse import ParseResult, urlparse
 
 
-def get_url_dir_list(url: str) -> list[str]:
+def list_remote_dir(url: str) -> list[str]:
     """Get a directory listing from an FTP or HTTP URL.
 
     Parameters

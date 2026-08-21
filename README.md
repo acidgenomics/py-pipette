@@ -1,8 +1,8 @@
 # pipette
 
-[![Install with Bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](https://bioconda.github.io/recipes/pipette/README.html) ![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)
+[![Install with Bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](https://bioconda.github.io/recipes/pipette/README.html) ![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)
 
-Unified import and export of data in Python.
+Unified reading and writing of data in Python.
 
 ## Installation
 
@@ -48,28 +48,28 @@ Conda has no equivalent of Python extras. For the optional format support that
 
 ## Quick Start
 
-### Import
+### Read
 
 ```python
 import pipette
 
-# Import a CSV file.
-df = pipette.import_data("data.csv")
+# Read a CSV file.
+df = pipette.read("data.csv")
 
-# Import a TSV file.
-df = pipette.import_data("data.tsv")
+# Read a TSV file.
+df = pipette.read("data.tsv")
 
-# Import an Excel file (requires openpyxl).
-df = pipette.import_data("data.xlsx")
+# Read an Excel file (requires openpyxl).
+df = pipette.read("data.xlsx")
 
-# Import JSON.
-data = pipette.import_data("data.json")
+# Read JSON.
+data = pipette.read("data.json")
 
-# Import from a URL.
-df = pipette.import_data("https://example.com/data.csv")
+# Read from a URL.
+df = pipette.read("https://example.com/data.csv")
 ```
 
-### Export
+### Write
 
 ```python
 import pandas as pd
@@ -80,14 +80,14 @@ df = pd.DataFrame(
     index=["gene1", "gene2", "gene3"],
 )
 
-# Export to CSV.
-pipette.export_data(df, "output.csv")
+# Write to CSV.
+pipette.write(df, "output.csv")
 
-# Export to TSV.
-pipette.export_data(df, "output.tsv")
+# Write to TSV.
+pipette.write(df, "output.tsv")
 
-# Export compressed.
-pipette.export_data(df, "output.csv.gz")
+# Write compressed.
+pipette.write(df, "output.csv.gz")
 ```
 
 ### Data Transformation
@@ -96,32 +96,19 @@ pipette.export_data(df, "output.csv.gz")
 # Sanitize NA values in string columns.
 df = pipette.sanitize_na(df)
 
-# Remove all-NA rows and columns.
-df = pipette.remove_na(df)
-
 # Convert columns with duplicates to categorical.
-df = pipette.factorize(df)
+df = pipette.categorize(df)
 
-# Convert categorical columns back to atomic types.
-df = pipette.unfactorize(df)
+# Convert categorical columns back to their underlying type.
+df = pipette.uncategorize(df)
 
-# Keep only scalar columns.
-df = pipette.atomize(df)
-```
-
-### Checksums
-
-```python
-# Get MD5 checksum of a file.
-checksum = pipette.md5("file.csv")
-
-# Get SHA-256 checksum of a file.
-checksum = pipette.sha256("file.csv")
+# Drop columns holding nested (non-scalar) values.
+df = pipette.drop_nested_columns(df)
 ```
 
 ## Supported Formats
 
-### Import
+### Read
 
 | Format         | Extension                   | Dependencies |
 |:---------------|:----------------------------|:-------------|
@@ -142,7 +129,7 @@ checksum = pipette.sha256("file.csv")
 | Feather/Arrow  | `.feather`, `.arrow`        | pyarrow      |
 | HDF5           | `.h5`, `.hdf5`              | -            |
 
-### Export
+### Write
 
 | Format         | Extension                   | Dependencies |
 |:---------------|:----------------------------|:-------------|
@@ -167,7 +154,6 @@ Compressed output is supported via `.gz`, `.bz2`, `.xz`, and `.zip` suffixes.
 [python]: https://www.python.org/
 [python.acidgenomics.com]: https://python.acidgenomics.com
 [uv]: https://docs.astral.sh/uv/
-
 
 ## License
 

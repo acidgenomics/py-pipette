@@ -1,4 +1,4 @@
-"""Import data from various file formats."""
+"""Read data from various file formats."""
 
 import contextlib
 import json
@@ -17,7 +17,7 @@ from pipette._file_utils import (
     local_or_remote_file,
 )
 from pipette._globals import NA_STRINGS
-from pipette._match_rowname_column import match_rowname_column
+from pipette._match_rowname_column import _match_rowname_column
 
 _R_ONLY_FORMATS = {"rds", "rda"}
 _GENOMICS_FORMATS = {
@@ -40,30 +40,31 @@ _GENOMICS_FORMATS = {
 }
 
 
-def import_data(
-    path: str,
+def read(
+    path: str | os.PathLike[str],
+    *,
     format: str | None = None,
-    rownames: bool = True,
+    index: bool = True,
     colnames: bool | list[str] = True,
     skip: int = 0,
     nmax: int | None = None,
     comment: str | None = None,
     na_strings: list[str] | None = None,
     make_names: bool = True,
-    quiet: bool = False,
     sheet: int | str | None = None,
+    quiet: bool = False,
     **kwargs: Any,
 ) -> Any:
-    """Import data from a file.
+    """Read data from a file.
 
     Parameters
     ----------
-    path : str
+    path : str or os.PathLike
         Local file path or URL.
     format : str, optional
         Force a specific format (e.g. ``"csv"``). Auto-detected by default.
-    rownames : bool
-        Detect and set row names from column.
+    index : bool
+        Detect a row name column and set it as the index.
     colnames : bool or list of str
         Use first row as column names, or provide custom names.
     skip : int
@@ -76,23 +77,24 @@ def import_data(
         Strings to treat as NA.
     make_names : bool
         Sanitize column names to valid Python identifiers.
-    quiet : bool
-        Suppress messages.
     sheet : int or str, optional
         Sheet name or index for Excel files.
+    quiet : bool
+        Suppress messages.
     **kwargs
         Extra arguments passed to the underlying reader.
 
     Returns
     -------
     pd.DataFrame, dict, list, or other
-        Imported data, type depends on format.
+        Data read from ``path``, type depends on format.
     """
+    path = os.fspath(path)
     if na_strings is None:
         na_strings = NA_STRINGS
     with local_or_remote_file(path) as local_path:
         if not quiet:
-            print(f"Importing {path}")
+            print(f"Reading {path}")
         fmt = format
         if fmt is None:
             ext = base_ext(local_path)
@@ -117,10 +119,10 @@ def import_data(
         if comp is not None and fmt not in ("mtx",):
             decompressed = decompress_file(local_path)
             try:
-                return _import_by_format(
+                return _read_by_format(
                     decompressed,
                     fmt,
-                    rownames=rownames,
+                    index=index,
                     colnames=colnames,
                     skip=skip,
                     nmax=nmax,
@@ -133,10 +135,10 @@ def import_data(
             finally:
                 if decompressed != local_path and os.path.exists(decompressed):
                     os.unlink(decompressed)
-        return _import_by_format(
+        return _read_by_format(
             local_path,
             fmt,
-            rownames=rownames,
+            index=index,
             colnames=colnames,
             skip=skip,
             nmax=nmax,
@@ -148,25 +150,25 @@ def import_data(
         )
 
 
-def _import_by_format(path: str, fmt: str, **kwargs: Any) -> Any:
-    """Dispatch import to format-specific handler."""
+def _read_by_format(path: str, fmt: str, **kwargs: Any) -> Any:
+    """Dispatch read to a format-specific handler."""
     handlers = {
-        "csv": _import_delim,
-        "tsv": _import_delim,
-        "json": _import_json,
-        "yaml": _import_yaml,
-        "excel": _import_excel,
-        "pickle": _import_pickle,
-        "lines": _import_lines,
-        "gmt": _import_gmt,
-        "gmx": _import_gmx,
-        "grp": _import_grp,
-        "gct": _import_gct,
-        "gaf": _import_gaf,
-        "mtx": _import_mtx,
-        "parquet": _import_parquet,
-        "feather": _import_feather,
-        "hdf5": _import_hdf5,
+        "csv": _read_delim,
+        "tsv": _read_delim,
+        "json": _read_json,
+        "yaml": _read_yaml,
+        "excel": _read_excel,
+        "pickle": _read_pickle,
+        "lines": _read_lines,
+        "gmt": _read_gmt,
+        "gmx": _read_gmx,
+        "grp": _read_grp,
+        "gct": _read_gct,
+        "gaf": _read_gaf,
+        "mtx": _read_mtx,
+        "parquet": _read_parquet,
+        "feather": _read_feather,
+        "hdf5": _read_hdf5,
     }
     handler = handlers.get(fmt)
     if handler is None:
@@ -178,10 +180,11 @@ def _import_by_format(path: str, fmt: str, **kwargs: Any) -> Any:
     return handler(path, **kwargs)
 
 
-def _import_delim(
+def _read_delim(
     path: str,
+    *,
     sep: str = ",",
-    rownames: bool = True,
+    index: bool = True,
     colnames: bool | list[str] = True,
     skip: int = 0,
     nmax: int | None = None,
@@ -190,7 +193,7 @@ def _import_delim(
     make_names: bool = True,
     **kwargs: Any,
 ) -> pd.DataFrame:
-    """Import delimited file (CSV/TSV)."""
+    """Read a delimited file (CSV/TSV)."""
     header = 0 if colnames is True else None
     names = colnames if isinstance(colnames, list) else None
     nrows = nmax
@@ -209,17 +212,17 @@ def _import_delim(
     )
     if make_names and colnames is not False:
         df.columns = _make_valid_names(list(df.columns))
-    return _return_import(df, rownames=rownames)
+    return _finalize_frame(df, index=index)
 
 
-def _import_json(path: str, **kwargs: Any) -> Any:
-    """Import JSON file."""
+def _read_json(path: str, **kwargs: Any) -> Any:
+    """Read a JSON file."""
     with open(path) as f:
         return json.load(f)
 
 
-def _import_yaml(path: str, **kwargs: Any) -> Any:
-    """Import YAML file."""
+def _read_yaml(path: str, **kwargs: Any) -> Any:
+    """Read a YAML file."""
     try:
         import yaml  # noqa: PLC0415
     except ImportError as err:
@@ -230,16 +233,17 @@ def _import_yaml(path: str, **kwargs: Any) -> Any:
         return yaml.safe_load(f)
 
 
-def _import_excel(
+def _read_excel(
     path: str,
+    *,
     sheet: int | str | None = None,
-    rownames: bool = True,
+    index: bool = True,
     colnames: bool | list[str] = True,
     make_names: bool = True,
     na_strings: list[str] | None = None,
     **kwargs: Any,
 ) -> pd.DataFrame:
-    """Import Excel file."""
+    """Read an Excel file."""
     try:
         import openpyxl  # noqa: F401, PLC0415
     except ImportError as err:
@@ -259,17 +263,17 @@ def _import_excel(
     )
     if make_names and colnames is not False:
         df.columns = _make_valid_names(list(df.columns))
-    return _return_import(df, rownames=rownames)
+    return _finalize_frame(df, index=index)
 
 
-def _import_pickle(path: str, **kwargs: Any) -> Any:
-    """Import pickle file."""
+def _read_pickle(path: str, **kwargs: Any) -> Any:
+    """Read a pickle file."""
     with open(path, "rb") as f:
         return pickle.load(f)
 
 
-def _import_lines(path: str, comment: str | None = None, **kwargs: Any) -> list[str]:
-    """Import file as list of lines."""
+def _read_lines(path: str, *, comment: str | None = None, **kwargs: Any) -> list[str]:
+    """Read a file as a list of lines."""
     with open(path) as f:
         lines = [line.rstrip("\n\r") for line in f]
     if comment:
@@ -278,8 +282,8 @@ def _import_lines(path: str, comment: str | None = None, **kwargs: Any) -> list[
     return lines
 
 
-def _import_gmt(path: str, **kwargs: Any) -> dict[str, list[str]]:
-    """Import GMT (Gene Matrix Transposed) file."""
+def _read_gmt(path: str, **kwargs: Any) -> dict[str, list[str]]:
+    """Read a GMT (Gene Matrix Transposed) file."""
     result: dict[str, list[str]] = {}
     with open(path) as f:
         for line in f:
@@ -292,8 +296,8 @@ def _import_gmt(path: str, **kwargs: Any) -> dict[str, list[str]]:
     return result
 
 
-def _import_gmx(path: str, **kwargs: Any) -> dict[str, list[str]]:
-    """Import GMX file."""
+def _read_gmx(path: str, **kwargs: Any) -> dict[str, list[str]]:
+    """Read a GMX file."""
     with open(path) as f:
         lines = [line.rstrip("\n\r").split("\t") for line in f]
     if not lines:
@@ -309,16 +313,16 @@ def _import_gmx(path: str, **kwargs: Any) -> dict[str, list[str]]:
     return result
 
 
-def _import_grp(path: str, **kwargs: Any) -> list[str]:
-    """Import GRP file."""
+def _read_grp(path: str, **kwargs: Any) -> list[str]:
+    """Read a GRP file."""
     with open(path) as f:
         return [line.rstrip("\n\r") for line in f if line.strip() and not line.startswith("#")]
 
 
-def _import_gct(
-    path: str, rownames: bool = True, make_names: bool = True, **kwargs: Any
+def _read_gct(
+    path: str, *, index: bool = True, make_names: bool = True, **kwargs: Any
 ) -> pd.DataFrame:
-    """Import GCT file."""
+    """Read a GCT file."""
     with open(path) as f:
         version_line = f.readline().rstrip()
         if not version_line.startswith("#1"):
@@ -341,13 +345,13 @@ def _import_gct(
         df = df.rename(columns={"NAME": "rowname"})
     if make_names:
         df.columns = _make_valid_names(list(df.columns))
-    return _return_import(df, rownames=rownames)
+    return _finalize_frame(df, index=index)
 
 
-def _import_gaf(
-    path: str, rownames: bool = True, make_names: bool = True, **kwargs: Any
+def _read_gaf(
+    path: str, *, index: bool = True, make_names: bool = True, **kwargs: Any
 ) -> pd.DataFrame:
-    """Import GAF (Gene Association Format) file."""
+    """Read a GAF (Gene Association Format) file."""
     cols = [
         "db",
         "db_object_id",
@@ -378,8 +382,8 @@ def _import_gaf(
     return df
 
 
-def _import_mtx(path: str, rownames: bool = True, **kwargs: Any) -> Any:
-    """Import MTX (Matrix Market) file."""
+def _read_mtx(path: str, *, index: bool = True, **kwargs: Any) -> Any:
+    """Read an MTX (Matrix Market) file."""
     try:
         from scipy.io import mmread  # noqa: PLC0415
     except ImportError as err:
@@ -390,10 +394,10 @@ def _import_mtx(path: str, rownames: bool = True, **kwargs: Any) -> Any:
     return mat
 
 
-def _import_parquet(
-    path: str, rownames: bool = True, make_names: bool = True, **kwargs: Any
+def _read_parquet(
+    path: str, *, index: bool = True, make_names: bool = True, **kwargs: Any
 ) -> pd.DataFrame:
-    """Import Parquet file."""
+    """Read a Parquet file."""
     try:
         import pyarrow.parquet as pq  # noqa: PLC0415
     except ImportError as err:
@@ -403,39 +407,39 @@ def _import_parquet(
     df = pq.read_table(path).to_pandas()
     if make_names:
         df.columns = _make_valid_names(list(df.columns))
-    return _return_import(df, rownames=rownames)
+    return _finalize_frame(df, index=index)
 
 
-def _import_feather(
-    path: str, rownames: bool = True, make_names: bool = True, **kwargs: Any
+def _read_feather(
+    path: str, *, index: bool = True, make_names: bool = True, **kwargs: Any
 ) -> pd.DataFrame:
-    """Import Feather/Arrow IPC file."""
+    """Read a Feather/Arrow IPC file."""
     try:
-        import pyarrow.feather as pf  # noqa: PLC0415
+        import pyarrow  # noqa: F401, PLC0415
     except ImportError as err:
         raise ImportError(
             "pyarrow is required for Feather support. Install it with: pip install pyarrow"
         ) from err
-    df = pf.read_feather(path)
+    df = pd.read_feather(path)
     if make_names:
         df.columns = _make_valid_names(list(df.columns))
-    return _return_import(df, rownames=rownames)
+    return _finalize_frame(df, index=index)
 
 
-def _import_hdf5(path: str, rownames: bool = True, make_names: bool = True, **kwargs: Any) -> Any:
-    """Import HDF5 file."""
+def _read_hdf5(path: str, *, index: bool = True, make_names: bool = True, **kwargs: Any) -> Any:
+    """Read an HDF5 file."""
     df = pd.read_hdf(path)
     if isinstance(df, pd.DataFrame):
         if make_names:
             df.columns = _make_valid_names(list(df.columns))
-        return _return_import(df, rownames=rownames)
+        return _finalize_frame(df, index=index)
     return df
 
 
-def _return_import(df: pd.DataFrame, rownames: bool = True) -> pd.DataFrame:
-    """Post-process imported DataFrame.
+def _finalize_frame(df: pd.DataFrame, *, index: bool = True) -> pd.DataFrame:
+    """Post-process a DataFrame that was just read.
 
-    Detects row name column and sets it as the index.
+    Detects a row name column and sets it as the index.
     Coerces numeric columns from string.
     """
     if not isinstance(df, pd.DataFrame):
@@ -444,8 +448,8 @@ def _return_import(df: pd.DataFrame, rownames: bool = True) -> pd.DataFrame:
         if df[col].dtype == object:
             with contextlib.suppress(ValueError, TypeError):
                 df[col] = pd.to_numeric(df[col])
-    if rownames:
-        rn_col = match_rowname_column(df)
+    if index:
+        rn_col = _match_rowname_column(df)
         if rn_col is not None:
             df = df.set_index(rn_col)
             df.index.name = None

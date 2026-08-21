@@ -1,28 +1,15 @@
 Reference
 =========
 
-Import/export
--------------
+Read and write
+---------------
 
 .. autosummary::
    :toctree: generated
    :nosignatures:
 
-   ~pipette.import_data
-   ~pipette.export_data
-
-Saved Python objects
----------------------
-
-.. autosummary::
-   :toctree: generated
-   :nosignatures:
-
-   ~pipette.assign_and_save_data
-   ~pipette.load_data
-   ~pipette.load_data_as_name
-   ~pipette.load_remote_data
-   ~pipette.save_data
+   ~pipette.read
+   ~pipette.write
 
 File transfers
 --------------
@@ -32,32 +19,22 @@ File transfers
    :nosignatures:
 
    ~pipette.cache_url
-   ~pipette.md5
-   ~pipette.sha256
-   ~pipette.get_json
-   ~pipette.get_url_dir_list
+   ~pipette.list_remote_dir
    ~pipette.transmit
 
-Data modification and sanitization
--------------------------------------
+Data sanitization
+------------------
 
 .. autosummary::
    :toctree: generated
    :nosignatures:
 
-   ~pipette.atomize
-   ~pipette.decode
-   ~pipette.droplevels
-   ~pipette.encode
-   ~pipette.factorize
-   ~pipette.fill_lines
-   ~pipette.match_rowname_column
-   ~pipette.metadata2
-   ~pipette.na_strings
-   ~pipette.remove_na
+   ~pipette.categorize
+   ~pipette.drop_nested_columns
+   ~pipette.NA_STRINGS
    ~pipette.sanitize_na
    ~pipette.sanitize_percent
-   ~pipette.unfactorize
+   ~pipette.uncategorize
 
 Utilities
 ---------
@@ -66,5 +43,5 @@ Utilities
    :toctree: generated
    :nosignatures:
 
-   ~pipette.init_dir
-   ~pipette.paste_url
+   ~pipette.fill_lines
+   ~pipette.join_url

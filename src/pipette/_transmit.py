@@ -5,12 +5,13 @@ import os
 import urllib.request
 from urllib.parse import urljoin
 
-from pipette._get_url_dir_list import get_url_dir_list
+from pipette._list_remote_dir import list_remote_dir
 
 
 def transmit(
     url: str,
-    dir: str = ".",
+    *,
+    path: str | os.PathLike[str] = ".",
     pattern: str | None = None,
     quiet: bool = False,
 ) -> list[str]:
@@ -20,7 +21,7 @@ def transmit(
     ----------
     url : str
         URL to a remote directory.
-    dir : str
+    path : str or os.PathLike
         Local directory to save files.
     pattern : str, optional
         Glob pattern to filter files.
@@ -32,14 +33,15 @@ def transmit(
     list of str
         Paths to downloaded files.
     """
-    os.makedirs(dir, exist_ok=True)
-    entries = get_url_dir_list(url)
+    path = os.fspath(path)
+    os.makedirs(path, exist_ok=True)
+    entries = list_remote_dir(url)
     if pattern is not None:
         entries = [e for e in entries if fnmatch.fnmatch(e, pattern)]
     paths = []
     for entry in entries:
         file_url = urljoin(url.rstrip("/") + "/", entry)
-        dest = os.path.join(dir, entry)
+        dest = os.path.join(path, entry)
         if not quiet:
             print(f"Downloading {file_url} -> {dest}")
         urllib.request.urlretrieve(file_url, dest)

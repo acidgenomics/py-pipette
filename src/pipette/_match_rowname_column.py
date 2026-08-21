@@ -5,7 +5,7 @@ import pandas as pd
 _ROWNAME_PATTERNS = {"rn", "row.name", "row.names", "rowname", "rownames"}
 
 
-def match_rowname_column(df: pd.DataFrame) -> str | None:
+def _match_rowname_column(df: pd.DataFrame) -> str | None:
     """Detect a row name column in a DataFrame.
 
     Checks for columns matching common row name patterns.
