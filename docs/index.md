@@ -113,53 +113,6 @@ for an `s3://` target.
 `NaN`; `categorize`/`uncategorize` convert duplicated string columns to/from
 `Categorical`; `drop_nested_columns` keeps only scalar-valued columns.
 
-## Migrating from 0.1.x
-
-`import_data`/`export_data` are now `read`/`write`. Several 0.1.x wrappers over
-R conventions have no replacement function; use the plain Python idiom instead:
-
-```python
-# save_data(x, "obj", dir=d, ext="csv") / assign_and_save_data("obj", x, dir=d)
-pipette.write(x, Path(d) / "obj.csv")
-
-# load_data("obj", dir=d)
-pipette.read(next(Path(d).glob("obj.*")))
-
-# load_data("a", "b", dir=d)
-{p.stem: pipette.read(p) for p in Path(d).glob("*")}
-
-# load_remote_data(url)
-pipette.read(pipette.cache_url(url))
-
-# load_data_as_name(("new", "old"), dir=d)
-# Python binds whatever name you write; no equivalent function is needed.
-new = pipette.read(next(Path(d).glob("old.*")))
-
-# encode(df, j=["a"]) / factorize(df)
-pipette.categorize(df, columns=["a"])
-pipette.categorize(df)
-
-# metadata2(df, "genome", "GRCh38") / metadata2(df, "genome")
-df.attrs["genome"] = "GRCh38"
-df.attrs.get("genome")
-
-# droplevels(df)
-df["tissue"] = df["tissue"].cat.remove_unused_categories()
-
-# remove_na(df, how="all")
-df.dropna(axis=0, how="all").dropna(axis=1, how="all")
-
-# md5(path)
-with open(path, "rb") as f:
-    hashlib.file_digest(f, "md5").hexdigest()
-
-# init_dir(d)
-Path(d).mkdir(parents=True, exist_ok=True)
-
-# get_json(url)
-pipette.read(url, format="json")
-```
-
 ## Optional dependencies
 
 - **openpyxl**: Excel file support.
