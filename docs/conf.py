@@ -22,6 +22,7 @@ napoleon_google_docstring = False
 numpydoc_show_class_members = False
 html_theme = "acidgenomics"
 html_theme_path = ["_themes"]
+html_title = "pipette"
 html_theme_options = {
     "sitesearch": "python.acidgenomics.com",
     "repo_url": "https://github.com/acidgenomics/py-pipette",
