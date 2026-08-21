@@ -1,38 +1,7 @@
 """Tests for utility functions."""
 
-from pipette._checksums import md5, sha256
 from pipette._file_utils import basename_sans_ext, compress_ext, file_ext, is_url
 from pipette._fill_lines import fill_lines
-
-
-class TestMd5:
-    def test_basic(self, tmp_path) -> None:
-        path = tmp_path / "test.txt"
-        path.write_text("hello world\n")
-        result = md5(str(path))
-        assert isinstance(result, str)
-        assert len(result) == 32
-
-    def test_deterministic(self, tmp_path) -> None:
-        path = tmp_path / "test.txt"
-        path.write_text("hello")
-        assert md5(str(path)) == md5(str(path))
-
-
-class TestSha256:
-    def test_basic(self, tmp_path) -> None:
-        path = tmp_path / "test.txt"
-        path.write_text("hello world\n")
-        result = sha256(str(path))
-        assert isinstance(result, str)
-        assert len(result) == 64
-
-    def test_different_content(self, tmp_path) -> None:
-        f1 = tmp_path / "f1.txt"
-        f2 = tmp_path / "f2.txt"
-        f1.write_text("content1")
-        f2.write_text("content2")
-        assert sha256(str(f1)) != sha256(str(f2))
 
 
 class TestFillLines:

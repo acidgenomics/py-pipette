@@ -25,6 +25,10 @@ html_theme_path = ["_themes"]
 html_theme_options = {
     "sitesearch": "python.acidgenomics.com",
     "repo_url": "https://github.com/acidgenomics/py-pipette",
+    "copyright_start_year": "2018",
+    "license_name": "Apache 2.0",
+    "license_url": "https://www.apache.org/licenses/LICENSE-2.0",
+    "license_file_url": "https://github.com/acidgenomics/py-pipette/blob/main/LICENSE",
 }
 html_show_sourcelink = False
 html_show_sphinx = False

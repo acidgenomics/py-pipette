@@ -5,15 +5,15 @@ requires = ["uv_build>=0.11,<1"]
 [project]
 name = "pipette"
 version = "0.1.0"
-description = "Unified import and export of data in Python."
+description = "Unified reading and writing of data in Python."
 readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
 requires-python = ">=3.12"
 authors = [{ name = "Michael Steinbaugh", email = "mike@steinbaugh.com" }]
-keywords = ["bioinformatics", "data-import", "data-export", "genomics", "io"]
+keywords = ["bioinformatics", "data-io", "genomics", "io"]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
@@ -187,7 +187,6 @@ convention = "numpy"
 allow-magic-value-types = ["bytes", "int", "str"]
 max-args = 30
 max-branches = 30
-max-positional-args = 11
 max-statements = 100
 
 [tool.ty]

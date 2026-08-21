@@ -17,7 +17,4 @@ NA_STRINGS: list[str] = [
     "none",
     "null",
 ]
-"""Strings treated as NA during import."""
-
-PIPETTE_TESTS_URL: str = "https://r.acidgenomics.com/testdata/pipette"
-"""Base URL for pipette test data files."""
+"""Strings treated as NA when reading a file."""

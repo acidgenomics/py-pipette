@@ -1,9 +1,9 @@
-"""Atomize a DataFrame by keeping only scalar columns."""
+"""Drop DataFrame columns holding nested (non-scalar) values."""
 
 import pandas as pd
 
 
-def atomize(df: pd.DataFrame) -> pd.DataFrame:
+def drop_nested_columns(df: pd.DataFrame) -> pd.DataFrame:
     """Keep only columns containing scalar (atomic) values.
 
     Removes columns where any value is a list, dict, set, or other

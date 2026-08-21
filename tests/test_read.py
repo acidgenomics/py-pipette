@@ -1,12 +1,13 @@
-"""Tests for pipette import functionality."""
+"""Tests for pipette read functionality."""
 
 import json
 import pickle
+from pathlib import Path
 
 import pandas as pd
 import pytest
 
-from pipette._import import _make_valid_names, import_data
+from pipette._read import _make_valid_names, read
 
 
 @pytest.fixture
@@ -48,71 +49,82 @@ def example_lines(tmp_path):
     return str(path)
 
 
-class TestImportCSV:
-    def test_basic_import(self, example_csv) -> None:
-        df = import_data(example_csv, quiet=True)
+class TestReadCSV:
+    def test_basic_read(self, example_csv) -> None:
+        df = read(example_csv, quiet=True)
         assert isinstance(df, pd.DataFrame)
         assert df.shape == (5, 4)
         assert list(df.index) == ["gene1", "gene2", "gene3", "gene4", "gene5"]
 
-    def test_import_no_rownames(self, example_csv) -> None:
-        df = import_data(example_csv, rownames=False, quiet=True)
+    def test_read_no_index(self, example_csv) -> None:
+        df = read(example_csv, index=False, quiet=True)
         assert isinstance(df, pd.DataFrame)
         assert df.shape == (5, 5)
         assert "rowname" in df.columns
 
-    def test_import_format_override(self, example_csv) -> None:
-        df = import_data(example_csv, format="csv", quiet=True)
+    def test_read_format_override(self, example_csv) -> None:
+        df = read(example_csv, format="csv", quiet=True)
         assert isinstance(df, pd.DataFrame)
 
+    def test_read_path_object(self, example_csv) -> None:
+        df = read(Path(example_csv), quiet=True)
+        assert isinstance(df, pd.DataFrame)
+        assert df.shape == (5, 4)
 
-class TestImportTSV:
-    def test_basic_import(self, example_tsv) -> None:
-        df = import_data(example_tsv, quiet=True)
+
+class TestReadTSV:
+    def test_basic_read(self, example_tsv) -> None:
+        df = read(example_tsv, quiet=True)
         assert isinstance(df, pd.DataFrame)
         assert df.shape == (2, 2)
         assert list(df.index) == ["gene1", "gene2"]
 
 
-class TestImportJSON:
-    def test_basic_import(self, example_json) -> None:
-        result = import_data(example_json, quiet=True)
+class TestReadJSON:
+    def test_basic_read(self, example_json) -> None:
+        result = read(example_json, quiet=True)
         assert isinstance(result, dict)
         assert result["key1"] == "value1"
 
 
-class TestImportLines:
-    def test_basic_import(self, example_lines) -> None:
-        result = import_data(example_lines, quiet=True)
+class TestReadLines:
+    def test_basic_read(self, example_lines) -> None:
+        result = read(example_lines, quiet=True)
         assert isinstance(result, list)
         assert "line1" in result
 
     def test_comment_filter(self, example_lines) -> None:
-        result = import_data(example_lines, comment="#", quiet=True)
+        result = read(example_lines, comment="#", quiet=True)
         assert "# comment" not in result
 
 
-class TestImportGMT:
+class TestReadGMT:
     def test_basic_gmt(self, tmp_path) -> None:
         content = (
             "PATHWAY1\tdescription1\tGENE1\tGENE2\tGENE3\nPATHWAY2\tdescription2\tGENE4\tGENE5\n"
         )
         path = tmp_path / "example.gmt"
         path.write_text(content)
-        result = import_data(str(path), quiet=True)
+        result = read(str(path), quiet=True)
         assert isinstance(result, dict)
         assert len(result) == 2
         assert result["PATHWAY1"] == ["GENE1", "GENE2", "GENE3"]
 
 
-class TestImportPickle:
+class TestReadPickle:
     def test_basic_pickle(self, tmp_path) -> None:
         data = {"key": "value", "numbers": [1, 2, 3]}
         path = tmp_path / "test.pickle"
         with open(str(path), "wb") as f:
             pickle.dump(data, f)
-        result = import_data(str(path), quiet=True)
+        result = read(str(path), quiet=True)
         assert result == data
+
+
+class TestReadMissing:
+    def test_missing_path_raises(self, tmp_path) -> None:
+        with pytest.raises(FileNotFoundError):
+            read(str(tmp_path / "nonexistent.csv"), quiet=True)
 
 
 class TestMakeValidNames:
@@ -132,4 +144,4 @@ class TestMakeValidNames:
         path = tmp_path / "file"
         path.write_text("data")
         with pytest.raises(ValueError, match="Cannot detect format"):
-            import_data(str(path), quiet=True)
+            read(str(path), quiet=True)

@@ -67,12 +67,12 @@ _FORMAT_MAP: dict[str, str] = {
 }
 
 
-def file_ext(path: str) -> str:
+def file_ext(path: str | os.PathLike[str]) -> str:
     """Get file extension(s), collapsing compound extensions.
 
     Parameters
     ----------
-    path : str
+    path : str or os.PathLike
         File path.
 
     Returns
@@ -82,7 +82,7 @@ def file_ext(path: str) -> str:
         compression extensions (e.g. ``csv.gz``) are collapsed to a
         single string.
     """
-    name = os.path.basename(path)
+    name = os.path.basename(os.fspath(path))
     parts = name.split(".")
     if len(parts) <= 1:
         return ""
@@ -92,12 +92,12 @@ def file_ext(path: str) -> str:
     return exts[-1].lower()
 
 
-def compress_ext(path: str) -> str | None:
+def compress_ext(path: str | os.PathLike[str]) -> str | None:
     """Get compression extension, or None.
 
     Parameters
     ----------
-    path : str
+    path : str or os.PathLike
         File path.
 
     Returns
@@ -105,13 +105,13 @@ def compress_ext(path: str) -> str | None:
     str or None
         Recognized compression extension, or ``None`` if not compressed.
     """
-    ext = os.path.basename(path).split(".")[-1].lower()
+    ext = os.path.basename(os.fspath(path)).split(".")[-1].lower()
     if ext in _COMPRESS_EXTS:
         return ext
     return None
 
 
-def base_ext(path: str) -> str:
+def base_ext(path: str | os.PathLike[str]) -> str:
     """Get the base (non-compression) file extension.
 
     For compound extensions like ``csv.gz``, returns ``csv``.
@@ -121,7 +121,7 @@ def base_ext(path: str) -> str:
 
     Parameters
     ----------
-    path : str
+    path : str or os.PathLike
         File path.
 
     Returns
@@ -139,12 +139,12 @@ def base_ext(path: str) -> str:
     return ext
 
 
-def is_url(path: str) -> bool:
+def is_url(path: str | os.PathLike[str]) -> bool:
     """Check if a path is a URL.
 
     Parameters
     ----------
-    path : str
+    path : str or os.PathLike
         Path or URL to check.
 
     Returns
@@ -153,15 +153,15 @@ def is_url(path: str) -> bool:
         ``True`` if ``path`` starts with ``http://``, ``https://``, or
         ``ftp://``.
     """
-    return bool(re.match(r"^(https?|ftp)://", path))
+    return bool(re.match(r"^(https?|ftp)://", os.fspath(path)))
 
 
-def basename_sans_ext(path: str) -> str:
+def basename_sans_ext(path: str | os.PathLike[str]) -> str:
     """Get basename without any extensions.
 
     Parameters
     ----------
-    path : str
+    path : str or os.PathLike
         File path.
 
     Returns
@@ -169,36 +169,21 @@ def basename_sans_ext(path: str) -> str:
     str
         Basename with all extensions removed.
     """
-    name = os.path.basename(path)
+    name = os.path.basename(os.fspath(path))
     parts = name.split(".")
     return parts[0]
 
 
-def init_dir(path: str) -> str:
-    """Create directory if it doesn't exist.
-
-    Parameters
-    ----------
-    path : str
-        Directory path to create.
-
-    Returns
-    -------
-    str
-        The ``path`` argument, unchanged.
-    """
-    os.makedirs(path, exist_ok=True)
-    return path
-
-
-def decompress_file(path: str, dest: str | None = None) -> str:
+def decompress_file(
+    path: str | os.PathLike[str], dest: str | os.PathLike[str] | None = None
+) -> str:
     """Decompress a file, returning path to decompressed file.
 
     Parameters
     ----------
-    path : str
+    path : str or os.PathLike
         Compressed file path.
-    dest : str, optional
+    dest : str or os.PathLike, optional
         Destination path for the decompressed file. Defaults to ``path``
         with its compression extension stripped.
 
@@ -208,6 +193,8 @@ def decompress_file(path: str, dest: str | None = None) -> str:
         Path to the decompressed file (or ``path`` unchanged if it isn't
         recognized as compressed).
     """
+    path = os.fspath(path)
+    dest = os.fspath(dest) if dest is not None else None
     ext = compress_ext(path)
     if ext is None:
         return path
@@ -230,12 +217,12 @@ def decompress_file(path: str, dest: str | None = None) -> str:
     return dest
 
 
-def compress_file(path: str, ext: str = "gz") -> str:
+def compress_file(path: str | os.PathLike[str], ext: str = "gz") -> str:
     """Compress a file, returning path to compressed file.
 
     Parameters
     ----------
-    path : str
+    path : str or os.PathLike
         File path to compress.
     ext : str
         Compression format: one of ``"gz"``, ``"bz2"``, ``"xz"``.
@@ -245,6 +232,7 @@ def compress_file(path: str, ext: str = "gz") -> str:
     str
         Path to the compressed file (``path`` with ``ext`` appended).
     """
+    path = os.fspath(path)
     dest = path + "." + ext
     openers = {"gz": gzip.open, "bz2": bz2.open, "xz": lzma.open}
     opener = openers.get(ext)
@@ -256,7 +244,7 @@ def compress_file(path: str, ext: str = "gz") -> str:
 
 
 @contextmanager
-def local_or_remote_file(path: str) -> Generator[str]:
+def local_or_remote_file(path: str | os.PathLike[str]) -> Generator[str]:
     """Context manager yielding a local file path.
 
     If path is a URL, downloads to a temp file and yields the temp path.
@@ -265,7 +253,7 @@ def local_or_remote_file(path: str) -> Generator[str]:
 
     Parameters
     ----------
-    path : str
+    path : str or os.PathLike
         Local path, URL, or S3 URI.
 
     Yields
@@ -273,6 +261,7 @@ def local_or_remote_file(path: str) -> Generator[str]:
     str
         A local filesystem path to ``path``'s contents.
     """
+    path = os.fspath(path)
     if is_url(path):
         suffix = "." + file_ext(path).split(".")[0] if file_ext(path) else ""
         with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
