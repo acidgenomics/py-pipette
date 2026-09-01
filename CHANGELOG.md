@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.1 (2026-09-01)
+
+### Changes
+
+- Rename the PyPI distribution to `acidgenomics-pipette`. The import name is
+  unchanged: `import pipette` still works.
+- Publish to PyPI instead of `python.acidgenomics.com` only.
+
 ## 0.2.0 (2026-08-21)
 
 ### Breaking changes

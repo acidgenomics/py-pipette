@@ -10,26 +10,18 @@ plus data-sanitization helpers for NA handling and categorical conversion.
 
 ### uv method
 
-This package is hosted at [python.acidgenomics.com](https://python.acidgenomics.com/).
+This package is hosted on [PyPI](https://pypi.org/project/acidgenomics-pipette/)
+as `acidgenomics-pipette`. The import name is unchanged: `pipette`.
 We recommend using [uv](https://docs.astral.sh/uv/) to install.
 
 ```sh
-uv pip install \
-    --index-url 'https://python.acidgenomics.com/simple/' \
-    'pipette[extra]'
+uv add 'acidgenomics-pipette[extra]'
 ```
 
-Or add the index to your project's `pyproject.toml`:
-
-```toml
-[[tool.uv.index]]
-url = "https://python.acidgenomics.com/simple/"
-```
-
-Then install:
+Or with [pip](https://pip.pypa.io/):
 
 ```sh
-uv add 'pipette[extra]'
+pip install 'acidgenomics-pipette[extra]'
 ```
 
 ### Conda method
