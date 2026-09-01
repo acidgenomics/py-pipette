@@ -4,7 +4,7 @@ requires = ["uv_build>=0.11,<1"]
 
 [project]
 name = "acidgenomics-pipette"
-version = "0.2.0"
+version = "0.2.1"
 description = "Unified reading and writing of data in Python."
 readme = "README.md"
 license = "Apache-2.0"
@@ -50,7 +50,7 @@ Changelog = "https://github.com/acidgenomics/py-pipette/blob/main/CHANGELOG.md"
 [tool.bumpver]
 commit = true
 commit_message = "Bump to {new_version}."
-current_version = "v0.2.0"
+current_version = "v0.2.1"
 push = false
 tag = false
 tag_message = "{new_version}"
