@@ -8,26 +8,18 @@ Unified reading and writing of data in Python.
 
 ### [uv][] method
 
-This is a [Python][] package hosted at [python.acidgenomics.com][].
+This is a [Python][] package hosted on [PyPI][] as `acidgenomics-pipette`.
+The import name is unchanged: `pipette`.
 We recommend using [uv][] to install.
 
 ```sh
-uv pip install \
-    --index-url 'https://python.acidgenomics.com/simple/' \
-    'pipette[extra]'
+uv add 'acidgenomics-pipette[extra]'
 ```
 
-Or add the index to your project's `pyproject.toml`:
-
-```toml
-[[tool.uv.index]]
-url = "https://python.acidgenomics.com/simple/"
-```
-
-Then install:
+Or with [pip][]:
 
 ```sh
-uv add 'pipette[extra]'
+pip install 'acidgenomics-pipette[extra]'
 ```
 
 ### [Conda][] method
@@ -151,8 +143,9 @@ Compressed output is supported via `.gz`, `.bz2`, `.xz`, and `.zip` suffixes.
 
 [bioconda]: https://bioconda.github.io/
 [conda]: https://docs.conda.io/
+[pip]: https://pip.pypa.io/
+[pypi]: https://pypi.org/project/acidgenomics-pipette/
 [python]: https://www.python.org/
-[python.acidgenomics.com]: https://python.acidgenomics.com
 [uv]: https://docs.astral.sh/uv/
 
 ## License
