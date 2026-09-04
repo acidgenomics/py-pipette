@@ -2,10 +2,10 @@
 #    uv pip compile pyproject.toml --output-file requirements.txt
 numpy==2.4.2
     # via
-    #   pipette (pyproject.toml)
+    #   acidgenomics-pipette (pyproject.toml)
     #   pandas
 pandas==3.0.0
-    # via pipette (pyproject.toml)
+    # via acidgenomics-pipette (pyproject.toml)
 python-dateutil==2.9.0.post0
     # via pandas
 six==1.17.0
